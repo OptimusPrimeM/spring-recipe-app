@@ -31,6 +31,9 @@ public class Recipe {
     inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories;
 
+    @OneToMany(cascade = CascadeType.ALL,mappedBy ="recipe" )
+    private Set<Ingredient> ingredients;
+
     public Long getId() {
         return id;
     }
