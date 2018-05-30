@@ -1,6 +1,7 @@
 package com.optimusprime.springrecipeapp.domain;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -14,6 +15,8 @@ public class Recipe {
     private Integer cookTime;
     private Integer serving;
     private String source;
+
+    @Lob
     private String directions;
 
     @Lob
@@ -29,10 +32,10 @@ public class Recipe {
     @JoinTable(name ="recipe_category",
     joinColumns = @JoinColumn(name ="recipe_id"),
     inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories;
+    private Set<Category> categories = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy ="recipe" )
-    private Set<Ingredient> ingredients;
+    private Set<Ingredient> ingredients = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -120,5 +123,13 @@ public class Recipe {
 
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
+    }
+
+    public Set<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(Set<Ingredient> ingredients) {
+        this.ingredients = ingredients;
     }
 }
