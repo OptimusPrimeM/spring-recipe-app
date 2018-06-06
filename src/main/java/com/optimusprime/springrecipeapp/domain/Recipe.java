@@ -18,6 +18,7 @@ public class Recipe {
     private Integer cookTime;
     private Integer serving;
     private String source;
+    private String url;
 
     @Lob
     private String directions;
@@ -50,5 +51,7 @@ public class Recipe {
         this.ingredients.add(ingredient);
         return this;
     }
+
+
 
 }
