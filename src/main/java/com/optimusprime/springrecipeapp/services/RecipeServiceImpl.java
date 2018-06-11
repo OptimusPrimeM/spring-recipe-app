@@ -1,9 +1,13 @@
 package com.optimusprime.springrecipeapp.services;
 
+import com.optimusprime.springrecipeapp.commands.RecipeCommand;
+import com.optimusprime.springrecipeapp.converters.RecipeCommandToRecipe;
+import com.optimusprime.springrecipeapp.converters.RecipeToRecipeCommand;
 import com.optimusprime.springrecipeapp.domain.Recipe;
 import com.optimusprime.springrecipeapp.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -14,9 +18,14 @@ import java.util.Set;
 public class RecipeServiceImpl implements  RecipeService{
 
     private final RecipeRepository recipeRepository;
+    private final RecipeToRecipeCommand recipeToRecipeCommand;
+    private final RecipeCommandToRecipe recipeCommandToRecipe;
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository) {
+
+    public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeToRecipeCommand recipeToRecipeCommand, RecipeCommandToRecipe recipeCommandToRecipe) {
         this.recipeRepository = recipeRepository;
+        this.recipeToRecipeCommand = recipeToRecipeCommand;
+        this.recipeCommandToRecipe = recipeCommandToRecipe;
     }
 
     @Override
@@ -36,5 +45,15 @@ public class RecipeServiceImpl implements  RecipeService{
              throw  new RuntimeException("Recipe not found");
         }
         return recipeOptional.get();
+    }
+
+    @Override
+    @Transactional
+    public RecipeCommand saveRecipeCommand(RecipeCommand command) {
+        Recipe detachedRecipe = recipeCommandToRecipe.convert(command);
+
+        Recipe saveRecipe =recipeRepository.save(detachedRecipe);
+        log.debug("Saved RecipeId: "+saveRecipe.getId());
+        return recipeToRecipeCommand.convert(saveRecipe);
     }
 }
