@@ -1,7 +1,6 @@
 package com.optimusprime.springrecipeapp.converters;
 
 import com.optimusprime.springrecipeapp.commands.IngredientCommand;
-import com.optimusprime.springrecipeapp.commands.NotesCommand;
 import com.optimusprime.springrecipeapp.commands.UnitOfMeasureCommand;
 import com.optimusprime.springrecipeapp.domain.Ingredient;
 import org.junit.Before;
@@ -44,7 +43,7 @@ public class IngredientCommandToIngredientTest {
         ingredientCommand.setDescription(DESCRIPTION);
         UnitOfMeasureCommand unitOfMeasureCommand=new UnitOfMeasureCommand();
         unitOfMeasureCommand.setId(UOM_ID);
-        ingredientCommand.setUnitOfMeasure(unitOfMeasureCommand);
+        ingredientCommand.setUom(unitOfMeasureCommand);
 
         //when
         Ingredient ingredient=converter.convert(ingredientCommand);
