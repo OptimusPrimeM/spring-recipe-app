@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
-public class RecipeServiceImpl implements  RecipeService{
+public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final RecipeToRecipeCommand recipeToRecipeCommand;
@@ -42,9 +42,9 @@ public class RecipeServiceImpl implements  RecipeService{
     public Recipe findById(Long l) {
         Optional<Recipe> recipeOptional = recipeRepository.findById(l);
 
-        if(!recipeOptional.isPresent()){
+        if (!recipeOptional.isPresent()) {
 //             throw  new RuntimeException("Recipe not found");
-             throw new NotFoundException("Recipe not found");
+            throw new NotFoundException("Recipe not found for id value" + l.toString());
         }
         return recipeOptional.get();
     }
@@ -52,12 +52,12 @@ public class RecipeServiceImpl implements  RecipeService{
     @Override
     @Transactional
     public RecipeCommand saveRecipeCommand(RecipeCommand command) {
-        Recipe saveRecipe =null;
+        Recipe saveRecipe = null;
         Recipe detachedRecipe = recipeCommandToRecipe.convert(command);
-         if (detachedRecipe!=null){
-              saveRecipe =recipeRepository.save(detachedRecipe);
-         }
-        log.debug("Saved RecipeId: "+saveRecipe.getId());
+        if (detachedRecipe != null) {
+            saveRecipe = recipeRepository.save(detachedRecipe);
+        }
+        log.debug("Saved RecipeId: " + saveRecipe.getId());
         return recipeToRecipeCommand.convert(saveRecipe);
     }
 
@@ -69,6 +69,6 @@ public class RecipeServiceImpl implements  RecipeService{
 
     @Override
     public void deleteById(Long idToDelete) {
-         recipeRepository.deleteById(idToDelete);
+        recipeRepository.deleteById(idToDelete);
     }
 }
