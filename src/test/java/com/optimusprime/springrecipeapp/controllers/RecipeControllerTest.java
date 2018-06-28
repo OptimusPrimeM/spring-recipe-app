@@ -2,6 +2,7 @@ package com.optimusprime.springrecipeapp.controllers;
 
 import com.optimusprime.springrecipeapp.commands.RecipeCommand;
 import com.optimusprime.springrecipeapp.domain.Recipe;
+import com.optimusprime.springrecipeapp.exceptions.NotFoundException;
 import com.optimusprime.springrecipeapp.services.RecipeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,31 +11,22 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.ui.Model;
 
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class RecipeControllerTest {
 
-    RecipeController recipeController;
+    private RecipeController recipeController;
 
     @Mock
-    RecipeService recipeService;
+    private RecipeService recipeService;
 
-    @Mock
-    Model model;
-
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
 
     @Before
@@ -64,7 +56,7 @@ public class RecipeControllerTest {
 
     @Test
     public void testGetNewRecipeFrom() throws Exception {
-        RecipeCommand command = new RecipeCommand();
+//        RecipeCommand command = new RecipeCommand();
 
         mockMvc.perform(get("/recipe/new"))
                 .andExpect(status().isOk())
@@ -109,5 +101,17 @@ public class RecipeControllerTest {
                 .andExpect(view().name("redirect:/"));
 
         verify(recipeService,times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    public void testGetRecipeNotFound() throws Exception {
+
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/recipe/1/show"))
+                .andExpect(status().isNotFound());
     }
 }

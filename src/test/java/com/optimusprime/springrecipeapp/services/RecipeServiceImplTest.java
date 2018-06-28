@@ -3,6 +3,7 @@ package com.optimusprime.springrecipeapp.services;
 import com.optimusprime.springrecipeapp.converters.RecipeCommandToRecipe;
 import com.optimusprime.springrecipeapp.converters.RecipeToRecipeCommand;
 import com.optimusprime.springrecipeapp.domain.Recipe;
+import com.optimusprime.springrecipeapp.exceptions.NotFoundException;
 import com.optimusprime.springrecipeapp.repositories.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,5 +80,14 @@ public class RecipeServiceImplTest {
 
         //then
         verify(recipeRepository,times(1)).deleteById(anyLong());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void getRecipeByIdTestNotFound() throws Exception {
+        Optional<Recipe> recipeOptional =Optional.empty();
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        Recipe recipeReturned = recipeService.findById(1L);
     }
 }

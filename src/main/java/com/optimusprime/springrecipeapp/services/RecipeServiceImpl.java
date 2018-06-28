@@ -4,6 +4,7 @@ import com.optimusprime.springrecipeapp.commands.RecipeCommand;
 import com.optimusprime.springrecipeapp.converters.RecipeCommandToRecipe;
 import com.optimusprime.springrecipeapp.converters.RecipeToRecipeCommand;
 import com.optimusprime.springrecipeapp.domain.Recipe;
+import com.optimusprime.springrecipeapp.exceptions.NotFoundException;
 import com.optimusprime.springrecipeapp.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,8 @@ public class RecipeServiceImpl implements  RecipeService{
         Optional<Recipe> recipeOptional = recipeRepository.findById(l);
 
         if(!recipeOptional.isPresent()){
-             throw  new RuntimeException("Recipe not found");
+//             throw  new RuntimeException("Recipe not found");
+             throw new NotFoundException("Recipe not found");
         }
         return recipeOptional.get();
     }
@@ -50,9 +52,11 @@ public class RecipeServiceImpl implements  RecipeService{
     @Override
     @Transactional
     public RecipeCommand saveRecipeCommand(RecipeCommand command) {
+        Recipe saveRecipe =null;
         Recipe detachedRecipe = recipeCommandToRecipe.convert(command);
-
-        Recipe saveRecipe =recipeRepository.save(detachedRecipe);
+         if (detachedRecipe!=null){
+              saveRecipe =recipeRepository.save(detachedRecipe);
+         }
         log.debug("Saved RecipeId: "+saveRecipe.getId());
         return recipeToRecipeCommand.convert(saveRecipe);
     }
