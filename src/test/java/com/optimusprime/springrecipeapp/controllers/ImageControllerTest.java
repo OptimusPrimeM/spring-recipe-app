@@ -7,12 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
@@ -73,5 +75,34 @@ public class ImageControllerTest {
 
         verify(imageService,times(1)).saveImageFile(anyLong(),any());
 
+    }
+
+    @Test
+    public void testRenderImageFromDB() throws Exception {
+        //given
+        RecipeCommand recipeCommand= new RecipeCommand();
+        recipeCommand.setId(1L);
+
+        String s = "fake image test";
+        Byte[] byteBoxed =  new Byte[s.getBytes().length];
+
+        int i = 0;
+
+        for(byte primByte: s.getBytes()){
+            byteBoxed[i++] = primByte;
+        }
+
+        recipeCommand.setImage(byteBoxed);
+
+        when(recipeService.findCommandById(anyLong())).thenReturn(recipeCommand);
+
+        //when
+        MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/recipeimage"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        byte[] responseByte =  response.getContentAsByteArray();
+
+        assertEquals(s.getBytes().length,responseByte.length);
     }
 }
