@@ -12,39 +12,34 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.ui.Model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class ImageControllerTest {
 
-    ImageController imageController;
+    @Mock
+    private ImageService imageService;
 
     @Mock
-    ImageService imageService;
+    private RecipeService recipeService;
 
-    @Mock
-    RecipeService recipeService;
 
-    @Mock
-    Model model;
-
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Before
     public void setUp() throws Exception {
+        ImageController imageController;
         MockitoAnnotations.initMocks(this);
         imageController = new ImageController(recipeService, imageService);
-        mockMvc = MockMvcBuilders.standaloneSetup(imageController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(imageController)
+                .setControllerAdvice(new ControllerExceptionHandler())
+                .build();
     }
 
     @Test
@@ -71,24 +66,24 @@ public class ImageControllerTest {
                         "Optimus Prime".getBytes());
         mockMvc.perform(multipart("/recipe/1/image").file(mockMultipartFile))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location","/recipe/1/show"));
+                .andExpect(header().string("Location", "/recipe/1/show"));
 
-        verify(imageService,times(1)).saveImageFile(anyLong(),any());
+        verify(imageService, times(1)).saveImageFile(anyLong(), any());
 
     }
 
     @Test
     public void testRenderImageFromDB() throws Exception {
         //given
-        RecipeCommand recipeCommand= new RecipeCommand();
+        RecipeCommand recipeCommand = new RecipeCommand();
         recipeCommand.setId(1L);
 
         String s = "fake image test";
-        Byte[] byteBoxed =  new Byte[s.getBytes().length];
+        Byte[] byteBoxed = new Byte[s.getBytes().length];
 
         int i = 0;
 
-        for(byte primByte: s.getBytes()){
+        for (byte primByte : s.getBytes()) {
             byteBoxed[i++] = primByte;
         }
 
@@ -101,8 +96,15 @@ public class ImageControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        byte[] responseByte =  response.getContentAsByteArray();
+        byte[] responseByte = response.getContentAsByteArray();
 
-        assertEquals(s.getBytes().length,responseByte.length);
+        assertEquals(s.getBytes().length, responseByte.length);
+    }
+
+    @Test
+    public void testGetImageNumberFormatException() throws Exception {
+        mockMvc.perform(get("/recipe/optimus/image"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"));
     }
 }
