@@ -41,7 +41,6 @@ public class RecipeCommand {
     private Byte[] image;
 
     @URL
-    @NotBlank
     private String url;
 
     @NotBlank
