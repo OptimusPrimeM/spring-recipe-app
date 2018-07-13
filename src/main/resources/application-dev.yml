@@ -2,6 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/sfg_dev
     username: sfg_dev_user
+    platform: mysql
 
   jpa:
     hibernate:
