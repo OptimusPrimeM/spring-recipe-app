@@ -1,17 +1,22 @@
 
 #Data source
+#spring:
+#  datasource:
+#    url: jdbc:h2:mem:~/testdb
+#    username: sa
+#  h2:
+#    console:
+#      enabled: true
+#
+#logging:
+#  level:
+#    com:
+#      optimusprime:
+#        springrecipeapp: debug
+
 spring:
-  datasource:
-    url: jdbc:h2:mem:~/testdb
-    username: sa
-  h2:
-    console:
-      enabled: true
-
-logging:
-  level:
-    com:
-      optimusprime:
-        springrecipeapp: debug
-
+  data:
+    mongodb:
+      port: 27017
+      host: localhost
 
